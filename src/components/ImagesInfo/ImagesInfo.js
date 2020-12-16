@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import ImageFinderAPI from "../../services/ImageFinderAPI";
 import ImageGallery from "../ImageGallery/ImageGallery";
+import axios from "axios";
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
@@ -44,26 +44,30 @@ export default class ImageInfo extends Component {
       this.setState({ status: Status.PENDING });
       this.fetchFromAPI();
     }
+
+    if (this.state.images.length !== prevState.images.length) {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   }
 
-  windowScroll = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
   fetchFromAPI = () => {
-    ImageFinderAPI.fetchImages(this.props.request, this.props.page)
+    const request = this.props.request;
+    const page = this.props.page;
+    const key = "18616543-61f088c3928fc4bac834774e6";
+    const url = `https://pixabay.com/api/?q=${request}&page=${page}&key=${key}&image_type=photo&orientation=horizontal&per_page=12`;
+    axios
+      .get(url)
       .then((images) => {
-        if (this.props.page > 1) {
+        if (page > 1) {
           this.setState((prevState) => ({
-            images: [...prevState.images, ...images.hits],
+            images: [...prevState.images, ...images.data.hits],
           }));
-          this.windowScroll();
         }
-        if (this.props.page === 1) {
-          this.setState({ images: images.hits });
+        if (page === 1) {
+          this.setState({ images: images.data.hits });
         }
         this.setState({ status: Status.RESOLVED });
       })

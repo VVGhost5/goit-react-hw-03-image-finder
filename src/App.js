@@ -52,7 +52,7 @@ export default class App extends Component {
           page={this.state.page}
           addPage={this.addPage}
           resetPage={this.resetPage}
-        ></ImagesInfo>
+        />
         <ToastContainer autoClose={3000} />
       </div>
     );
